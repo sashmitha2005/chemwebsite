@@ -1,0 +1,183 @@
+.custom-style {
+  font-size: 2.25rem; /* Increased font size */
+  font-weight: 600;   /* Extra bold font weight */
+  color: #003366;     /* Dark blue color */
+  margin-bottom: 2rem; /* Margin at the bottom */
+}
+.company-vision {
+  background: linear-gradient(135deg, #e0f4ff, #d3ecfa);
+  padding: 60px 20px;
+  text-align: left;
+}
+.company-mission {
+  background-color: #ffffff;
+  padding: 60px 20px;
+  text-align: left;
+}
+
+.company-overview {
+  background: linear-gradient(135deg, #e0f4ff, #d3ecfa);
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.heading {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 20px;
+}
+
+.highlight {
+  color: #0077c8;
+}
+
+.description {
+  color: #2d3748;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.cta-button {
+  display: inline-block;
+  background-color: #0077c8;
+  color: white;
+  padding: 12px 24px;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+  margin-top: 20px;
+}
+
+.cta-button:hover {
+  background-color: #005fa3;
+}
+
+.arrow {
+  margin-left: 8px;
+}
+.chemicals-section {
+  padding: 60px 20px;
+  background-color: #fff;
+  text-align: center;
+}
+
+.section-header h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a202c;
+}
+
+.section-header .highlight {
+  color: #0077c8;
+}
+
+.section-header p {
+  font-size: 1.125rem;
+  color: #2d3748;
+  margin: 16px 0 40px;
+}
+
+.chemicals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
+  justify-items: center;
+}
+
+.chemical-card {
+  background-color: #e4ebf3;
+  padding: 24px;
+  border-radius: 16px;
+  text-align: left;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease;
+  max-width: 350px;
+}
+
+.chemical-card:hover {
+  transform: translateY(-4px);
+}
+
+.icon-box {
+  font-size: 32px;
+  color: #0077c8;
+  background-color: #e0f2fe;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  display: inline-block;
+}
+
+.chemical-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.chemical-card p {
+  color: #2d3748;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+.customer-services-section {
+  background: linear-gradient(135deg, #e6f4fa, #d1e9f7);
+  padding: 60px 20px;
+  text-align: left;
+}
+
+.customer-services-section .container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.customer-services-section h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #1a202c;
+}
+
+.customer-services-section .highlight {
+  color: #0077c8;
+}
+
+.customer-services-section .description {
+  font-size: 1.125rem;
+  color: #2d3748;
+  margin-bottom: 32px;
+  max-width: 700px;
+}
+
+.service-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.service-list li {
+  font-size: 1.1rem;
+  color: #2d3748;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.check-icon {
+  font-size: 20px;
+  color: #0077c8;
+  margin-right: 10px;
+  background-color: #e0f2fe;
+  padding: 6px;
+  border-radius: 50%;
+}
+html {
+  scroll-behavior: smooth;
+}

@@ -1,0 +1,89 @@
+.my-orders-container {
+    background-color: #e0f7ff; /* Sky blue background */
+    padding: 2rem;
+    min-height: 100vh;
+  }
+  
+  .orders-heading {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #003049;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .no-orders {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #555;
+  }
+  
+  .orders-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  
+  .order-card {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .order-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #4caf50; /* Green color for the "Confirmed" title */
+    margin-bottom: 1rem;
+  }
+  
+  .user-details {
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+    color: #333;
+  }
+  
+  .order-items-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .order-item {
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #fafafa;
+  }
+  
+  .order-status-total {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    font-size: 1.1rem;
+    color: #333;
+  }
+  
+  .order-status-total p {
+    margin: 0;
+  }
+  
+  .order-status-total p strong {
+    font-weight: bold;
+  }
+  
+  .order-status-total p:first-child {
+    color: #ff5722; /* Status color */
+  }
+  
+  .order-status-total p:last-child {
+    color: #4caf50; /* Total Amount color */
+  }
+  
+  .order-status-total p:last-child {
+    font-weight: bold;
+  }
+  

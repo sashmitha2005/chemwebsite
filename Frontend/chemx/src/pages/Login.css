@@ -1,0 +1,145 @@
+/* Overlay: dark background */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+/* Modal box */
+.modal-content {
+  background-color: white;
+  padding: 25px 20px 30px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+  position: relative;
+  text-align: center;
+  overflow-y: auto; /* key fix */
+  box-sizing: border-box;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+
+/* Close button */
+.modal-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 1.5rem;
+  background-color: #008CBA;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Title */
+.modal-title {
+  font-size: 1.7rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #222;
+  word-wrap: break-word;
+  margin-top: 0;
+}
+
+/* Form */
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+}
+
+/* Inputs */
+.modal-form input {
+  padding: 12px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+}
+
+.modal-form input:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+/* Error messages */
+.error-text {
+  color: #e74c3c;
+  font-size: 0.9rem;
+  margin-top: -10px;
+  text-align: left;
+  padding-left: 2px;
+}
+
+/* Login button */
+.modal-form button {
+  padding: 12px;
+  background-color: #008CBA;
+  color: white;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s;
+}
+
+.modal-form button:hover {
+  background-color: #0079a1;
+}
+
+/* Bottom signup link */
+.modal-toggle {
+  margin-top: 15px;
+  font-size: 0.95rem;
+}
+
+.modal-toggle span {
+  color: #007BCA;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.modal-toggle span:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 20px 15px;
+    width: 90%;
+    max-height: 90vh;
+  }
+
+  .modal-form {
+    gap: 12px;
+  }
+
+  .modal-form input,
+  .modal-form button {
+    font-size: 1rem;
+  }
+}
