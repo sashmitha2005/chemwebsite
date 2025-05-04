@@ -13,7 +13,7 @@ const ProductPage = () => {
     const fetchProducts = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:5000/view", {
+        const response = await axios.get("https://chemwebsite.onrender.com/view", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -41,7 +41,7 @@ const ProductPage = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/addcart",
+        "https://chemwebsite.onrender.com/addcart",
         { productId, quantity: 1 },
         { headers: { Authorization: `Bearer ${token}` } }
       );

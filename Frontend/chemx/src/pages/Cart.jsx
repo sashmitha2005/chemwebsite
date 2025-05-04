@@ -29,7 +29,7 @@ const Cart = () => {
         return;
       }
 
-      const response = await axios.get("http://localhost:5000/viewcart", {
+      const response = await axios.get("https://chemwebsite.onrender.com/viewcart", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -48,7 +48,7 @@ const Cart = () => {
   const removeItem = async (productId) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/removecart/${productId}`, {
+      await axios.delete(`https://chemwebsite.onrender.com/removecart/${productId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchCartItems();
@@ -81,7 +81,7 @@ const Cart = () => {
       }
 
       const response = await axios.post(
-        "http://localhost:5000/cartorder",
+        "https://chemwebsite.onrender.com/cartorder",
         { products: orderData },
         {
           headers: {

@@ -25,7 +25,7 @@ const Signup = ({ setShowModal, setIsLogin }) => {
 
     if (Object.keys(validationErrors).length === 0) {
       try {
-        const response = await fetch("http://localhost:5000/register", {
+        const response = await fetch("https://chemwebsite.onrender.com/register", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"

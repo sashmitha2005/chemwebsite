@@ -26,7 +26,7 @@ const HomePage = () => {
 
   const handleAdminLogin = async () => {
     try {
-      const response = await fetch("http://localhost:5000/adminlogin", {
+      const response = await fetch("https://chemwebsite.onrender.com/adminlogin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -56,7 +56,7 @@ const HomePage = () => {
   <div className="navbar-container">
     <div className="navbar-left">
       <h1 className="text-3xl font-extrabold text-blue-700 tracking-wide">
-       
+        Southern Chemicals
       </h1>
     </div>
     <div className="navbar-right">
