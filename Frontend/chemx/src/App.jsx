@@ -11,6 +11,7 @@ import OrderPage from './pages/OrderPage'; // ✅ Import the order page
 import MyOrdersPage from './pages/MyOrders'; // ✅ Import the my orders page
 import Login from './pages/Login';
 import AdminPage from "./pages/AdminPage";
+import OrderBill from "./pages/OrderBill";
 
 function App() {
   return (
@@ -26,7 +27,8 @@ function App() {
         <Route path="/order" element={<OrderPage />} /> {/* ✅ Added route for order */}
         <Route path="/myorders" element={<MyOrdersPage />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/AdminPage" element={<AdminPage />} /> {/* ✅ Added route for my orders */}
+        <Route path="/AdminPage" element={<AdminPage />} /> 
+        <Route path="/bill" element={<OrderBill />} />{/* ✅ Added route for my orders */}
       </Routes>
     </Router>
   );

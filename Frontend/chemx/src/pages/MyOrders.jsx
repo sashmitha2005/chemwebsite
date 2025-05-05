@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "./MyOrders.css"; // Link to external CSS file
+import { useNavigate } from "react-router-dom";
+import "./MyOrders.css";
 
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -26,6 +28,10 @@ const MyOrders = () => {
 
     fetchOrders();
   }, []);
+
+  const goToBillPage = (order) => {
+    navigate("/bill", { state: { order } });
+  };
 
   return (
     <div className="my-orders-container">
@@ -65,6 +71,22 @@ const MyOrders = () => {
               </div>
 
               <p><strong>Order Date:</strong> {new Date(order.orderDate).toLocaleDateString()}</p>
+
+              <button
+                className="generate-bill-btn"
+                onClick={() => goToBillPage(order)}
+                style={{
+                  marginTop: "10px",
+                  padding: "8px 16px",
+                  backgroundColor: "#2563eb",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer"
+                }}
+              >
+                Generate Bill
+              </button>
             </div>
           ))}
         </div>
