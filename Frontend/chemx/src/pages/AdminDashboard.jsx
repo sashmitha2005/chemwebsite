@@ -5,7 +5,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend
 } from "recharts";
-import './AdminDashboard.css';
+import './AdminDashBoard.css';
 
 const sampleData = {
   "past week": [
