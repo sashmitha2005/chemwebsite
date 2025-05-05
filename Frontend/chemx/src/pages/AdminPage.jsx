@@ -303,7 +303,7 @@ const AdminPage = () => {
     const fetchProducts = async () => {
       try {
         const token = localStorage.getItem("adminToken");
-        const response = await axios.get("http://localhost:5000/view", {
+        const response = await axios.get("https://chemwebsite.onrender.com/view", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -328,7 +328,7 @@ const AdminPage = () => {
     try {
       const token = localStorage.getItem("adminToken");
       const response = await axios.post(
-        "http://localhost:5000/add",
+        "https://chemwebsite.onrender.com/add",
         newProduct,
         {
           headers: {
@@ -347,7 +347,7 @@ const AdminPage = () => {
   const handleDeleteProduct = async () => {
     try {
       const token = localStorage.getItem("adminToken");
-      await axios.delete(`http://localhost:5000/remove/${productToDelete}`, {
+      await axios.delete(`https://chemwebsite.onrender.com/remove/${productToDelete}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -364,7 +364,7 @@ const AdminPage = () => {
     try {
       const token = localStorage.getItem("adminToken");
       const response = await axios.put(
-        `http://localhost:5000/update/${productToUpdate.id}`,
+        `https://chemwebsite.onrender.com/update/${productToUpdate.id}`,
         productToUpdate,
         {
           headers: {
