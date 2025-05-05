@@ -12,7 +12,7 @@ import MyOrdersPage from './pages/MyOrders'; // ✅ Import the my orders page
 import Login from './pages/Login';
 import AdminPage from "./pages/AdminPage";
 import OrderBill from "./pages/OrderBill";
-import AdminDashboard from './pages/AdminDashboard';
+
 
 function App() {
   return (
@@ -30,7 +30,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/AdminPage" element={<AdminPage />} /> 
         <Route path="/bill" element={<OrderBill />} />
-        <Route path="/admindashboard" element={<AdminDashboard />} />
+        
 
          
 {/* ✅ Added route for my orders */}
