@@ -6,6 +6,8 @@ import {
   PieChart, Pie, Cell, Legend
 } from "recharts";
 
+import './AdminDashboard.css';
+
 const sampleData = {
   "past week": [
     { label: "Mon", orders: 20, revenue: 1000 },
