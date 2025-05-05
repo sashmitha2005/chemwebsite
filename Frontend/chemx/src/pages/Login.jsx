@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import './Login.css';
 
-const Login = ({ setShowModal, setIsLogin }) => {
+const Login = ({ setShowModal, setIsLogin, setShowAdminModal }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
@@ -45,7 +45,6 @@ const Login = ({ setShowModal, setIsLogin }) => {
           return;
         }
 
-        // ✅ Use consistent key: "token"
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
@@ -61,34 +60,47 @@ const Login = ({ setShowModal, setIsLogin }) => {
 
   return (
     <div className="modal-overlay">
-    <div className="modal-content">
-      <button className="modal-close" onClick={() => setShowModal(false)}>&times;</button>
-      
-      <h3 className="modal-title">Login</h3>
-      <form className="modal-form" onSubmit={handleSubmit}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        {errors.email && <p className="error-text">{errors.email}</p>}
+      <div className="modal-content">
+        <button className="modal-close" onClick={() => setShowModal(false)}>
+          &times;
+        </button>
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        {errors.password && <p className="error-text">{errors.password}</p>}
+        <h3 className="modal-title">Login</h3>
+        <form className="modal-form" onSubmit={handleSubmit}>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          {errors.email && <p className="error-text">{errors.email}</p>}
 
-        <button type="submit">Login</button>
-      </form>
-      <p className="modal-toggle">
-        Don't have an account? <span onClick={() => setIsLogin(false)}>Sign Up</span>
-      </p>
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          {errors.password && <p className="error-text">{errors.password}</p>}
 
-    </div>
+          <button type="submit">Login</button>
+        </form>
+
+        <p className="modal-toggle">
+          Don't have an account?{" "}
+          <span onClick={() => setIsLogin(false)}>Sign Up</span>
+        </p>
+
+        <p
+          className="modal-toggle cursor-pointer text-blue-600 hover:underline mt-2"
+          onClick={() => {
+            setShowModal(false);
+            setShowAdminModal(true);
+          }}
+        >
+          Login as Admin
+        </p>
+      </div>
     </div>
   );
 };

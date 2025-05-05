@@ -7,40 +7,30 @@ import "./Home.css";
 const HomePage = () => {
   const [showModal, setShowModal] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
-  const [showAdminModal, setShowAdminModal] = useState(false); // For Admin login modal
+  const [showAdminModal, setShowAdminModal] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
   const handleCloseModal = () => setShowModal(false);
-
-  const handleAdminModal = () => {
-    setShowAdminModal(true);
-  };
-
-  const closeAdminModal = () => {
-    setShowAdminModal(false);
-  };
+  const closeAdminModal = () => setShowAdminModal(false);
 
   const handleAdminLogin = async () => {
     try {
       const response = await fetch("https://chemwebsite.onrender.com/adminlogin", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
 
       if (response.status === 200) {
-        localStorage.setItem("adminToken", data.token); // Store token for further requests
+        localStorage.setItem("adminToken", data.token);
         alert("Admin logged in successfully");
-        setShowAdminModal(false); // Close the modal
-        navigate("/adminpage"); // Navigate to the AdminPage after login
+        setShowAdminModal(false);
+        navigate("/adminpage");
       } else {
         setError(data.error);
       }
@@ -53,34 +43,33 @@ const HomePage = () => {
     <div className="bg-white min-h-screen text-gray-800 font-sans">
       {/* Navbar */}
       <header className="navbar">
-  <div className="navbar-container">
-    <div className="navbar-left">
-      <h1 className="text-3xl font-extrabold text-blue-700 tracking-wide">
-        Southern Chemicals
-      </h1>
-    </div>
-    <div className="navbar-right">
-      <ul className="flex space-x-8 text-lg items-center">
-        {["Company profile", "Our Products", "About", "Contact Us"].map((item, idx) => (
-          <li key={idx}>
-            <Link
-              to={`/${item.toLowerCase().replace(/\s+/g, "-")}`}
-              className="hover:text-blue-600 transition duration-200 font-medium"
-            >
-              {item}
-            </Link>
-          </li>
-        ))}
-        <li>
-          <button onClick={() => setShowModal(true)} className="login-button">
-            Login
-          </button>
-        </li>
-      </ul>
-    </div>
-  </div>
-</header>
-
+        <div className="navbar-container">
+          <div className="navbar-left">
+            <h1 className="text-3xl font-extrabold text-blue-700 tracking-wide">
+              Southern Chemicals
+            </h1>
+          </div>
+          <div className="navbar-right">
+            <ul className="flex space-x-8 text-lg items-center">
+              {["Company profile", "Our Products", "About", "Contact Us"].map((item, idx) => (
+                <li key={idx}>
+                  <Link
+                    to={`/${item.toLowerCase().replace(/\s+/g, "-")}`}
+                    className="hover:text-blue-600 transition duration-200 font-medium"
+                  >
+                    {item}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <button onClick={() => setShowModal(true)} className="login-button">
+                  Login
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </header>
 
       {/* Hero Section */}
       <section className="hero">
@@ -98,51 +87,46 @@ const HomePage = () => {
       {showModal && (
         <div className="modal-overlay">
           {isLogin ? (
-            <Login setShowModal={handleCloseModal} setIsLogin={setIsLogin} />
+            <Login
+              setShowModal={handleCloseModal}
+              setIsLogin={setIsLogin}
+              setShowAdminModal={setShowAdminModal}
+            />
           ) : (
             <Signup setShowModal={handleCloseModal} setIsLogin={setIsLogin} />
           )}
         </div>
       )}
 
-      {/* Admin Login Modal integrated */}
+      {/* Admin Login Modal */}
       {showAdminModal && (
-  <div className="modal-overlay">
-    <div className="modal-content">
-      <span className="close-icon" onClick={closeAdminModal}>
-        &times;
-      </span>
-      <h2 className="modal-title">Admin Login</h2>
-      {error && <p className="error-text">{error}</p>}
-      <input
-        type="email"
-        placeholder="Admin Email"
-        className="modal-input"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        className="modal-input"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button className="modal-button" onClick={handleAdminLogin}>
-        Login
-      </button>
-    </div>
-  </div>
-)}
-
-
-      {/* Admin Button at the Bottom-Left Corner */}
-      <button
-        onClick={handleAdminModal}
-        className="fixed bottom-4 right-4 bg-blue-500 text-white p-3 text-sm rounded-full"
-      >
-        Admin
-      </button>
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <span className="close-icon" onClick={closeAdminModal}>
+              &times;
+            </span>
+            <h2 className="modal-title">Admin Login</h2>
+            {error && <p className="error-text">{error}</p>}
+            <input
+              type="email"
+              placeholder="Admin Email"
+              className="modal-input"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              className="modal-input"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button className="modal-button" onClick={handleAdminLogin}>
+              Login
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
