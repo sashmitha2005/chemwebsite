@@ -2,20 +2,18 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./MyOrders.css";
+import { axiosClient } from "../axios/AxiosSetup";
 
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("https://chemwebsite.onrender.com/myorders", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
+        const response = await axiosClient.get("/myorders");
+  
         if (response.data.orders) {
           setOrders(response.data.orders);
         }
@@ -25,9 +23,10 @@ const MyOrders = () => {
         setLoading(false);
       }
     };
-
+  
     fetchOrders();
   }, []);
+  
 
   const goToBillPage = (order) => {
     navigate("/bill", { state: { order } });

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import './Login.css';
+import { axiosClient } from "../axios/AxiosSetup";
 
 const Login = ({ setShowModal, setIsLogin, setShowAdminModal }) => {
   const [email, setEmail] = useState("");
@@ -30,23 +31,15 @@ const Login = ({ setShowModal, setIsLogin, setShowAdminModal }) => {
 
     if (Object.keys(validationErrors).length === 0) {
       try {
-        const response = await fetch("https://chemwebsite.onrender.com/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ email, password })
+        const response = await axiosClient.post("/login", {
+          email, password
         });
 
-        const data = await response.json();
+        
 
-        if (!response.ok) {
-          alert(data.error || "Login failed. Please check your credentials.");
-          return;
-        }
+        
 
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
+        
 
         alert("Login successful!");
         setShowModal(false);

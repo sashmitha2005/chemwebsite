@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Login from "./Login";
 import Signup from "./Signup";
 import "./Home.css";
+import { axiosClient } from "../axios/AxiosSetup";
 
 const HomePage = () => {
   const [showModal, setShowModal] = useState(false);
@@ -18,16 +19,15 @@ const HomePage = () => {
 
   const handleAdminLogin = async () => {
     try {
-      const response = await fetch("https://chemwebsite.onrender.com/adminlogin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+      const response = await axiosClient.post("/adminlogin", {
+       
+        email, password 
       });
 
-      const data = await response.json();
+     
 
       if (response.status === 200) {
-        localStorage.setItem("adminToken", data.token);
+        
         alert("Admin logged in successfully");
         setShowAdminModal(false);
         navigate("/adminpage");

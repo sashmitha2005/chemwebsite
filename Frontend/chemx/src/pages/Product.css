@@ -109,3 +109,10 @@
 .buy-now:hover {
   background-color: #007bff;
 }
+.product-page-title {
+  text-align: center;
+  font-size: 2rem;
+  margin-top: 20px;
+  color: #2c3e50;
+  font-weight: bold;
+}

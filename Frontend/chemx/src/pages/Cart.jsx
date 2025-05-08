@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "./Cart.css"; // Link to external CSS
+import "./Cart.css";
+import { axiosClient } from "../axios/AxiosSetup";
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -29,12 +30,12 @@ const Cart = () => {
         return;
       }
 
-      const response = await axios.get("https://chemwebsite.onrender.com/viewcart", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axiosClient.get("/viewcart");
+      
 
       if (response.data.cart && response.data.cart.items) {
-        setCartItems(response.data.cart.items);
+        const validItems = response.data.cart.items.filter((item) => item.productId);
+        setCartItems(validItems);
       } else {
         setCartItems([]);
       }
@@ -48,9 +49,8 @@ const Cart = () => {
   const removeItem = async (productId) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`https://chemwebsite.onrender.com/removecart/${productId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axiosClient.delete(`/removecart/${productId}`);
+      
       fetchCartItems();
     } catch (error) {
       console.error("Error removing product:", error);
@@ -68,33 +68,37 @@ const Cart = () => {
               quantity: productToOrder.quantity,
             },
           ]
-        : cartItems
-            .filter((item) => item.productId)
-            .map((item) => ({
-              productId: item.productId._id || item.productId,
-              quantity: item.quantity,
-            }));
+        : cartItems.map((item) => ({
+            productId: item.productId._id || item.productId,
+            quantity: item.quantity,
+          }));
 
       if (orderData.length === 0) {
         alert("No valid products to order.");
         return;
       }
 
-      const response = await axios.post(
-        "https://chemwebsite.onrender.com/cartorder",
-        { products: orderData },
+      const response = await axiosClient.post(
+        "/cartorder",
+        {
+          products: orderData,
+          customer: userDetails,
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
+          withCredentials: true
         }
       );
+      
 
       alert("✅ Order placed successfully!");
       setCartItems([]);
       fetchCartItems();
       setShowForm(false);
+      setUserDetails({ name: "", address: "", phone: "" });
       navigate("/myorders", { state: { orders: response.data.orders } });
     } catch (error) {
       console.error("❌ Failed to place order:", error);
@@ -131,10 +135,7 @@ const Cart = () => {
   };
 
   const totalAmount = cartItems.reduce((acc, item) => {
-    if (item.productId && item.productId.price) {
-      return acc + item.quantity * item.productId.price;
-    }
-    return acc;
+    return acc + item.quantity * (item.productId?.price || 0);
   }, 0);
 
   return (
@@ -150,65 +151,62 @@ const Cart = () => {
           <div className="cart-grid">
             {cartItems.map((item, index) => (
               <div key={index} className="cart-card">
-                {item.productId ? (
-                  <>
-                    <h2>{item.productId.name || "Unnamed Product"}</h2>
-                    <p>Price: ₹{item.productId.price || "N/A"}</p>
-                    <div className="quantity-controls">
-                      <button onClick={() => decreaseQuantity(index)}>-</button>
-                      <span>{item.quantity}</span>
-                      <button onClick={() => increaseQuantity(index)}>+</button>
-                    </div>
-                    <div className="button-group">
-                      <button
-                        className="remove-btn"
-                        onClick={() =>
-                          removeItem(item.productId._id || item.productId)
-                        }
-                      >
-                        Remove
-                      </button>
-                      <button
-                        className="buy-btn"
-                        onClick={() => handleBuyNowClick(item)}
-                      >
-                        Buy Now
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <p className="invalid-product">Invalid product in cart.</p>
-                )}
+                <h2>{item.productId.name || "Unnamed Product"}</h2>
+                <p>Price: ₹{item.productId.price || "N/A"}</p>
+                <div className="quantity-controls">
+                  <button onClick={() => decreaseQuantity(index)}>-</button>
+                  <span>{item.quantity}</span>
+                  <button onClick={() => increaseQuantity(index)}>+</button>
+                </div>
+                <div className="button-group">
+                  <button
+                    className="remove-btn"
+                    onClick={() => removeItem(item.productId._id || item.productId)}
+                  >
+                    Remove
+                  </button>
+                  <button
+                    className="buy-btn"
+                    onClick={() => handleBuyNowClick(item)}
+                  >
+                    Buy Now
+                  </button>
+                </div>
               </div>
             ))}
           </div>
 
-          <div className="total-amount">
-            Total Amount: ₹{totalAmount}
-          </div>
+          <div className="total-amount">Total Amount: ₹{totalAmount}</div>
 
           <div className="place-order">
-            <button onClick={() => placeOrder()}>Place All Orders</button>
+            <button
+              onClick={() => {
+                setSelectedProduct(null);
+                setShowForm(true);
+              }}
+            >
+              Place All Orders
+            </button>
           </div>
         </>
       )}
 
       <div className="back-btn">
-        <button onClick={() => window.history.back()}>
-          ← Back to Products
-        </button>
+        <button onClick={() => window.history.back()}>← Back to Products</button>
       </div>
 
-      {showForm && selectedProduct && (
+      {showForm && (
         <div className="modal-overlay">
           <form onSubmit={handleFormSubmit} className="modal-form">
             <h2>Confirm Order</h2>
-            <p>
-              Product:{" "}
-              <span className="product-name">
-                {selectedProduct.productId?.name}
-              </span>
-            </p>
+            {selectedProduct && (
+              <p>
+                Product:{" "}
+                <span className="product-name">
+                  {selectedProduct.productId?.name}
+                </span>
+              </p>
+            )}
             <input
               type="text"
               placeholder="Name"

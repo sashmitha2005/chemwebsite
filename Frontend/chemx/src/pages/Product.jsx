@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Product.css";
+import { axiosClient } from "../axios/AxiosSetup";
 
 const ProductPage = () => {
   const navigate = useNavigate();
@@ -13,14 +14,14 @@ const ProductPage = () => {
     const fetchProducts = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("https://chemwebsite.onrender.com/view", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+       
+
+        const response = await axiosClient.get(
+          "/view"
+        );
 
         if (response.data && Array.isArray(response.data.products)) {
           setProducts(response.data.products);
-        } else {
-          setProducts([]);
         }
       } catch (error) {
         console.error("Failed to fetch products:", error);
@@ -40,13 +41,13 @@ const ProductPage = () => {
     }
 
     try {
-      const response = await axios.post(
-        "https://chemwebsite.onrender.com/addcart",
+      const response = await axiosClient.post(
+        "/addcart",
         { productId, quantity: 1 },
-        { headers: { Authorization: `Bearer ${token}` } }
+        
       );
 
-      setCartCount(cartCount + 1);
+      setCartCount((prev) => prev + 1);
       setCartMessage(`${productName} added to cart!`);
       setTimeout(() => setCartMessage(""), 3000);
     } catch (error) {
@@ -66,6 +67,8 @@ const ProductPage = () => {
 
   return (
     <div className="product-wrapper">
+      <h1 className="product-page-title">Available Products</h1>
+
       <div className="cart-icon" onClick={navigateToCart}>
         🛒 {cartCount}
       </div>
@@ -82,12 +85,18 @@ const ProductPage = () => {
               <p className="product-quantity">Quantity: {product.quantity}</p>
               <p className="product-price">Price: Rs.{product.price}</p>
               <p className="product-unit">Unit: {product.unit}</p>
+               {product.image && (
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="product-image"
+                  style={{ width: 100, height: 100 }}
+                />
+              )} 
               <div className="product-buttons">
                 <button
                   className="add-to-cart"
-                  onClick={() =>
-                    handleAddToCart(product._id, product.name)
-                  }
+                  onClick={() => handleAddToCart(product._id, product.name)}
                 >
                   Add to Cart
                 </button>

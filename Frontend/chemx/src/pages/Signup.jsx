@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { axiosClient } from "../axios/AxiosSetup";
 
 const Signup = ({ setShowModal, setIsLogin }) => {
   const [email, setEmail] = useState("");
@@ -25,12 +26,8 @@ const Signup = ({ setShowModal, setIsLogin }) => {
 
     if (Object.keys(validationErrors).length === 0) {
       try {
-        const response = await fetch("https://chemwebsite.onrender.com/register", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ name, email, password })
+        const response = await axiosClient.post("/register", {
+          name, email, password 
         });
 
         const data = await response.json();
