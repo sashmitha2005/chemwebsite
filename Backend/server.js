@@ -20,7 +20,7 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     httpOnly: true,        // Prevent JavaScript access – keep as true
-    secure: true,          // Send only over HTTPS
+    secure: false,          // Send only over HTTPS
     sameSite: 'none',      // Allow cross-site cookies (e.g., if frontend and backend are on different domains)
     maxAge: 7 * 24 * 60 * 60 * 1000,  // 7 days
   },
