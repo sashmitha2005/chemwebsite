@@ -14,17 +14,18 @@ app.use(cors({credentials:true,origin:"https://chemwebsite-sfu7.vercel.app"}));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
-  name: 'sessionId',             // cookie name
+  name: 'sessionId',
   secret: 'your-secret',
   resave: true,
   saveUninitialized: false,
   cookie: {
-    httpOnly: false,              // JavaScript can’t access it (good)
-    secure: false,                // true if using HTTPS
-    sameSite: 'lax',            // required for cross-origin
+    httpOnly: true,        // Prevent JavaScript access – keep as true
+    secure: true,          // Send only over HTTPS
+    sameSite: 'none',      // Allow cross-site cookies (e.g., if frontend and backend are on different domains)
     maxAge: 7 * 24 * 60 * 60 * 1000,  // 7 days
   },
 }));
+
 app.use(express.json());
 
 
