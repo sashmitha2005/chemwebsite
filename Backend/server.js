@@ -10,21 +10,21 @@ const authRoutes = require('./routes/Auth');
 const app = express();
 
 app.use(cors({credentials:true,origin:"https://chemwebsite-sfu7.vercel.app"}));
-
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true }));
 app.use(session({
   name: 'sessionId',
   secret: 'your-secret',
   resave: true,
   saveUninitialized: false,
   cookie: {
-    httpOnly: true,        // Prevent JavaScript access – keep as true
+    httpOnly: false,        // Prevent JavaScript access – keep as true
     secure: false,          // Send only over HTTPS
     sameSite: 'none',      // Allow cross-site cookies (e.g., if frontend and backend are on different domains)
     maxAge: 7 * 24 * 60 * 60 * 1000,  // 7 days
   },
 }));
+
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true }));
 
 app.use(express.json());
 
