@@ -69,8 +69,10 @@ const companyData = [
       "Bifunctional Dyes",
     ],
   },
+  
   // Add more companies and products as needed
 ];
+
 
 const OurProducts = () => {
   return (

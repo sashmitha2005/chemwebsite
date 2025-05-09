@@ -7,13 +7,25 @@ const Admin = require('../models/admin');
 const Product = require('../models/product');
 const Cart = require('../models/cart');
 const Order = require('../models/order');
+const nodemailer = require("nodemailer");
 const authMiddleware = require("../middleware/user.auth");
 const adminAuth = require("../middleware/admin.auth");
 const userAuth = require('../middleware/user.auth');
+const crypto = require('crypto');
 
 const router = express.Router();
 
 
+
+// Nexmo API credentials (replace with your own)
+const NEXMO_API_KEY = process.env.NEXMO_API_KEY;
+const NEXMO_API_SECRET = process.env.NEXMO_API_SECRET;
+const NEXMO_BRAND_NAME = 'Southern Chemicals'; // Your brand name or sender ID
+
+// Function to generate OTP
+function generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
+}
 
 // Registration Route
 router.post('/register', async (req, res) => {
@@ -349,5 +361,216 @@ router.get('/view', adminAuth, async (req, res) => {
     res.status(500).json({ error: "Failed to retrieve products" });
   }
 });
+// Get all orders (Admin only)
+router.get('/adminorders', authMiddleware, async (req, res) => {
+  try {
+    // Fetch all orders from the database, populate relevant fields
+    const orders = await Order.find()
+      .populate('items.productId', 'name price')  // Populate product name and price
+      .populate('userId', 'name email')  // Populate user name and email
+      .sort({ orderDate: -1 });  // Sort orders by order date (descending)
+
+    res.json({ orders });
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
+
+
+router.post('/forgot-password', async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.resetPasswordToken = otp;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    await user.save();
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      to: email,
+      from: `"Southern Chemicals" <${process.env.EMAIL_USER}>`,
+      subject: 'Password Reset OTP - Southern Chemicals',
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd;">
+          <h2 style="color: #0e6ba8;">Southern Chemicals</h2>
+          <p>Hello,</p>
+          <p>Your One-Time Password (OTP) to reset your password is:</p>
+          <h3 style="color: #e63946;">${otp}</h3>
+          <p>This OTP is valid for 1 hour. Please do not share it with anyone.</p>
+
+          <hr />
+          <p style="margin-top: 20px;">
+            <strong>Southern Chemicals</strong><br />
+            123 Industrial Road, Chennai, Tamil Nadu - 600001<br />
+            Email: southernchemicals@example.com<br />
+            Phone: +91-9876543210
+          </p>
+        </div>
+      `,
+    });
+
+    res.status(200).json({ message: 'OTP sent to email' });
+  } catch (err) {
+    console.error('Error in /forgot-password:', err.message);
+    res.status(500).json({ error: "Something went wrong", details: err.message });
+  }
+});
+
+
+router.post('/verify-otp', async (req, res) => {
+  const { email, otp } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user || !user.resetPasswordToken || !user.resetPasswordExpires) {
+      return res.status(400).json({ error: "OTP not found or expired" });
+    }
+
+    const isOtpValid = user.resetPasswordToken === otp && user.resetPasswordExpires > Date.now();
+    if (!isOtpValid) {
+      return res.status(400).json({ error: "Invalid or expired OTP" });
+    }
+
+    // ✅ Don't clear OTP here
+    res.status(200).json({ message: "OTP verified successfully" });
+  } catch (err) {
+    console.error('Error in /verify-otp:', err);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
+
+
+router.post('/reset-password', async (req, res) => {
+  const { email, newPassword, otp } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    if (user.resetPasswordToken !== otp || user.resetPasswordExpires < Date.now()) {
+      return res.status(400).json({ error: "Invalid or expired OTP" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+
+    // ✅ Clear OTP after successful password reset
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+
+    res.status(200).json({ message: "Password has been reset successfully" });
+  } catch (err) {
+    console.error('Error in /reset-password:', err);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
+let otpStore = {};
+
+router.post("/send-otp", async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) return res.status(400).json({ error: "Email is required" });
+
+  try {
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Store OTP and expiry time (for your logic like storing in memory or DB)
+    otpStore[email] = {
+      otp,
+      expiresAt: Date.now() + 5 * 60 * 1000, // OTP expires in 5 minutes
+    };
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      to: email,
+      from: `"Southern Chemicals" <${process.env.EMAIL_USER}>`,
+      subject: 'Your OTP Code - Southern Chemicals',
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd;">
+          <h2 style="color: #0e6ba8;">Southern Chemicals</h2>
+          <p>Hello,</p>
+          <p>Your One-Time Password (OTP) is:</p>
+          <h3 style="color: #e63946;">${otp}</h3>
+          <p>This OTP is valid for 5 minutes. Please do not share it with anyone.</p>
+
+          <hr />
+          <p style="margin-top: 20px;">
+            <strong>Southern Chemicals</strong><br />
+            123 Industrial Road, Chennai, Tamil Nadu - 600001<br />
+            Email: southernchemicals@example.com<br />
+            Phone: +91-9876543210
+          </p>
+        </div>
+      `,
+    });
+
+   res.status(200).json({ message: 'OTP sent to email', otp }); // Return OTP for frontend storage (only for testing)
+
+  } catch (err) {
+    console.error('Error in /send-otp:', err.message);
+    res.status(500).json({ error: "Failed to send OTP", details: err.message });
+  }
+});
+// Route to verify OTP for order
+router.post("/order-otp", (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return res.status(400).json({ error: "Email and OTP are required" });
+  }
+
+  const storedOtpData = otpStore[email];
+
+  if (!storedOtpData) {
+    return res.status(400).json({ error: "No OTP found for this email" });
+  }
+
+  const { otp: storedOtp, expiresAt } = storedOtpData;
+
+  if (Date.now() > expiresAt) {
+    delete otpStore[email]; // Clear expired OTP
+    return res.status(400).json({ error: "OTP has expired" });
+  }
+
+  if (otp !== storedOtp) {
+    return res.status(400).json({ error: "Invalid OTP" });
+  }
+
+  // OTP is valid
+  delete otpStore[email]; // Clear OTP after successful verification
+  res.status(200).json({ message: "OTP verified successfully" });
+});
+
+
+module.exports = { router};
+
+
 
 module.exports = router;

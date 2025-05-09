@@ -100,12 +100,7 @@ const ProductPage = () => {
                 >
                   Add to Cart
                 </button>
-                <button
-                  className="buy-now"
-                  onClick={() => handleBuyNow(product.name)}
-                >
-                  Buy Now
-                </button>
+                
               </div>
             </div>
           ))

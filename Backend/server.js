@@ -9,16 +9,16 @@ const authRoutes = require('./routes/Auth');
 
 const app = express();
 
-app.use(cors({credentials:true,origin:"https://chemwebsite-sfu7.vercel.app"}));
+app.use(cors({credentials:true,origin:"http://localhost:5173"})); // Adjust the origin as needed
 app.use(session({
-  name: 'sessionId',
+  name: 'sessionId',             // cookie name
   secret: 'your-secret',
   resave: true,
   saveUninitialized: false,
   cookie: {
-    httpOnly: false,        // Prevent JavaScript access – keep as true
-    secure: false,          // Send only over HTTPS
-    sameSite: 'none',      // Allow cross-site cookies (e.g., if frontend and backend are on different domains)
+    httpOnly: false,              // JavaScript can’t access it (good)
+    secure: false,                // true if using HTTPS
+    sameSite: 'lax',            // required for cross-origin
     maxAge: 7 * 24 * 60 * 60 * 1000,  // 7 days
   },
 }));

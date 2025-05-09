@@ -23,20 +23,23 @@ const Signup = ({ setShowModal, setIsLogin }) => {
     const validationErrors = validateForm();
     setErrors(validationErrors);
     setServerError("");
-
+  
     if (Object.keys(validationErrors).length === 0) {
       try {
         const response = await axiosClient.post("/register", {
-          name, email, password 
+          name,
+          email,
+          password,
         });
-
-        const data = await response.json();
-
-        if (response.ok) {
+  
+        // Axios already parses the response, so use response.data
+        const data = response.data;
+  
+        if (response.status === 200) {
           alert("Signup successful!");
           setShowModal(false);
         } else {
-          setServerError(data.error || "Signup failed. Please try again.");
+          setServerError(data.error || "Signup successful!");
         }
       } catch (err) {
         setServerError("Server error. Please try again later.");
@@ -44,6 +47,7 @@ const Signup = ({ setShowModal, setIsLogin }) => {
       }
     }
   };
+  
 
   return (
     <div className="modal-content">

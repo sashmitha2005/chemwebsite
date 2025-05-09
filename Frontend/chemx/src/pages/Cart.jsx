@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./Cart.css";
 import { axiosClient } from "../axios/AxiosSetup";
@@ -10,11 +9,15 @@ const Cart = () => {
   const [showForm, setShowForm] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [userDetails, setUserDetails] = useState({
+    email: "",
     name: "",
     address: "",
     phone: "",
   });
-
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,8 +34,6 @@ const Cart = () => {
       }
 
       const response = await axiosClient.get("/viewcart");
-      
-
       if (response.data.cart && response.data.cart.items) {
         const validItems = response.data.cart.items.filter((item) => item.productId);
         setCartItems(validItems);
@@ -48,26 +49,119 @@ const Cart = () => {
 
   const removeItem = async (productId) => {
     try {
-      const token = localStorage.getItem("token");
       await axiosClient.delete(`/removecart/${productId}`);
-      
       fetchCartItems();
     } catch (error) {
       console.error("Error removing product:", error);
     }
   };
 
+  const increaseQuantity = (index) => {
+    const updatedCart = [...cartItems];
+    updatedCart[index].quantity += 1;
+    setCartItems(updatedCart);
+  };
+
+  const decreaseQuantity = (index) => {
+    const updatedCart = [...cartItems];
+    if (updatedCart[index].quantity > 1) {
+      updatedCart[index].quantity -= 1;
+      setCartItems(updatedCart);
+    }
+  };
+
+  const handleBuyNowClick = (item) => {
+    setSelectedProduct(item);
+    setShowForm(true);
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    const nameRegex = /^[a-zA-Z\s]+$/;
+    const phoneRegex = /^[0-9]{10}$/;
+    const emailRegex = /^\S+@\S+\.\S+$/;
+
+    if (!userDetails.email.trim()) {
+      errors.email = "Email is required";
+    } else if (!emailRegex.test(userDetails.email.trim())) {
+      errors.email = "Invalid email format";
+    }
+
+    if (!userDetails.name.trim()) {
+      errors.name = "Name is required";
+    } else if (!nameRegex.test(userDetails.name.trim())) {
+      errors.name = "Name must contain only letters and spaces";
+    }
+
+    if (!userDetails.address.trim()) {
+      errors.address = "Address is required";
+    } else if (userDetails.address.trim().length < 10) {
+      errors.address = "Address must be at least 10 characters";
+    }
+
+    if (!userDetails.phone.trim()) {
+      errors.phone = "Phone number is required";
+    } else if (!phoneRegex.test(userDetails.phone.trim())) {
+      errors.phone = "Phone number must be 10 digits";
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const sendOtp = async () => {
+    try {
+      const response = await axiosClient.post("/send-otp", {
+        email: userDetails.email,
+      });
+
+      const generatedOtp = response.data.otp;
+
+      if (generatedOtp) {
+        localStorage.setItem("generatedOtp", generatedOtp); // Store OTP for test verification
+        alert("OTP sent to your email");
+        setOtpSent(true);
+      } else {
+        alert("Failed to receive OTP");
+      }
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+      alert("Error sending OTP");
+    }
+  };
+
+  const verifyOtp = async () => {
+    const storedOtp = localStorage.getItem("generatedOtp");
+
+    try {
+      await axiosClient.post("/order-otp", {
+        email: userDetails.email,
+        otp: storedOtp,
+      });
+
+      alert("✅ OTP verified successfully!");
+      setOtpVerified(true);
+      localStorage.removeItem("generatedOtp");
+    } catch (error) {
+      console.error("OTP verification failed:", error);
+      alert(error.response?.data?.error || "OTP verification failed");
+    }
+  };
+
   const placeOrder = async (productToOrder = null) => {
+    if (!otpVerified) {
+      alert("Please verify OTP before placing the order.");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
 
       const orderData = productToOrder
-        ? [
-            {
-              productId: productToOrder.productId._id || productToOrder.productId,
-              quantity: productToOrder.quantity,
-            },
-          ]
+        ? [{
+            productId: productToOrder.productId._id || productToOrder.productId,
+            quantity: productToOrder.quantity,
+          }]
         : cartItems.map((item) => ({
             productId: item.productId._id || item.productId,
             quantity: item.quantity,
@@ -89,49 +183,36 @@ const Cart = () => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          withCredentials: true
+          withCredentials: true,
         }
       );
-      
 
       alert("✅ Order placed successfully!");
       setCartItems([]);
       fetchCartItems();
       setShowForm(false);
-      setUserDetails({ name: "", address: "", phone: "" });
+      setOtpSent(false);
+      setOtpVerified(false);
+      setOtp("");
+      setUserDetails({ email: "", name: "", address: "", phone: "" });
+      setFormErrors({});
       navigate("/myorders", { state: { orders: response.data.orders } });
     } catch (error) {
       console.error("❌ Failed to place order:", error);
-      if (error.response?.data?.error) {
-        alert(`Error: ${error.response.data.error}`);
-      } else {
-        alert("Something went wrong while placing the order.");
-      }
+      alert(error.response?.data?.error || "Something went wrong while placing the order.");
     }
-  };
-
-  const increaseQuantity = (index) => {
-    const updatedItems = [...cartItems];
-    updatedItems[index].quantity += 1;
-    setCartItems(updatedItems);
-  };
-
-  const decreaseQuantity = (index) => {
-    const updatedItems = [...cartItems];
-    if (updatedItems[index].quantity > 1) {
-      updatedItems[index].quantity -= 1;
-      setCartItems(updatedItems);
-    }
-  };
-
-  const handleBuyNowClick = (item) => {
-    setSelectedProduct(item);
-    setShowForm(true);
   };
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    placeOrder(selectedProduct);
+    if (validateForm()) {
+      sendOtp();
+    }
+  };
+
+  const handleOtpSubmit = (e) => {
+    e.preventDefault();
+    verifyOtp();
   };
 
   const totalAmount = cartItems.reduce((acc, item) => {
@@ -140,6 +221,24 @@ const Cart = () => {
 
   return (
     <div className="cart-container">
+      <button
+        onClick={() => navigate("/myorders")}
+        className="my-orders-btn"
+        style={{
+          position: "absolute",
+          top: "10px",
+          right: "10px",
+          padding: "8px 16px",
+          backgroundColor: "#2563eb",
+          color: "white",
+          border: "none",
+          borderRadius: "4px",
+          cursor: "pointer",
+        }}
+      >
+        My Orders
+      </button>
+
       <h1 className="cart-heading">Your Cart</h1>
 
       {loading ? (
@@ -199,52 +298,72 @@ const Cart = () => {
         <div className="modal-overlay">
           <form onSubmit={handleFormSubmit} className="modal-form">
             <h2>Confirm Order</h2>
-            {selectedProduct && (
-              <p>
-                Product:{" "}
-                <span className="product-name">
-                  {selectedProduct.productId?.name}
-                </span>
-              </p>
-            )}
+
+            <input
+              type="email"
+              placeholder="Email Address"
+              value={userDetails.email}
+              onChange={(e) => setUserDetails({ ...userDetails, email: e.target.value })}
+            />
+            {formErrors.email && <span className="error">{formErrors.email}</span>}
+
             <input
               type="text"
               placeholder="Name"
-              required
               value={userDetails.name}
-              onChange={(e) =>
-                setUserDetails({ ...userDetails, name: e.target.value })
-              }
+              onChange={(e) => setUserDetails({ ...userDetails, name: e.target.value })}
             />
+            {formErrors.name && <span className="error">{formErrors.name}</span>}
+
             <input
               type="text"
               placeholder="Address"
-              required
               value={userDetails.address}
-              onChange={(e) =>
-                setUserDetails({ ...userDetails, address: e.target.value })
-              }
+              onChange={(e) => setUserDetails({ ...userDetails, address: e.target.value })}
             />
+            {formErrors.address && <span className="error">{formErrors.address}</span>}
+
             <input
               type="tel"
               placeholder="Phone Number"
-              required
               value={userDetails.phone}
-              onChange={(e) =>
-                setUserDetails({ ...userDetails, phone: e.target.value })
-              }
+              onChange={(e) => setUserDetails({ ...userDetails, phone: e.target.value })}
             />
+            {formErrors.phone && <span className="error">{formErrors.phone}</span>}
+
+            {otpSent && (
+              <div className="otp-input">
+                <input
+                  type="text"
+                  placeholder="Enter OTP"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                />
+                <button onClick={handleOtpSubmit}>Verify OTP</button>
+              </div>
+            )}
+
             <div className="modal-buttons">
-              <button type="button" onClick={() => setShowForm(false)}>
-                Cancel
-              </button>
-              <button type="submit">Confirm Order</button>
-            </div>
-          </form>
-        </div>
-      )}
-    </div>
-  );
+              <button type="button" onClick={() => setShowForm(false)}>Cancel</button>
+              {
+
+
+
+
+
+
+
+otpVerified ? (
+<button type="button" onClick={() => placeOrder(selectedProduct || null)}>Place Order</button>
+) : (
+<button type="submit">Send OTP</button>
+)}
+</div>
+</form>
+</div>
+)}
+</div>
+);
 };
 
 export default Cart;
