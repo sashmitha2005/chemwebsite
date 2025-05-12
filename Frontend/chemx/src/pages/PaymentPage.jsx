@@ -1,10 +1,22 @@
-import React, { useState } from "react";
-
+import React, { useEffect, useState } from "react";
 
 export default function PaymentPage() {
-  const [amount, setAmount] = useState(500); // Default ₹500
+  const [amount, setAmount] = useState(500);
+
+  // Load Razorpay script on mount
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
 
   const handleRazorpayPayment = () => {
+    if (!window.Razorpay) {
+      alert("Razorpay SDK not loaded yet. Please wait.");
+      return;
+    }
+
     const options = {
       key: "rzp_test_nt5GTCtjqpqi8E",
       amount: amount * 100,
@@ -13,8 +25,8 @@ export default function PaymentPage() {
       description: "Payment for services",
       image: "https://yourlogo.com/logo.png",
       handler: function (response) {
-        alert("✅ Payment Successful!");
-        alert("Payment ID: " + response.razorpay_payment_id);
+        alert("✅ Payment Successful!\nPayment ID: " + response.razorpay_payment_id);
+        setAmount(500);
       },
       prefill: {
         name: "Srisuthi P",
@@ -35,9 +47,6 @@ export default function PaymentPage() {
 
   return (
     <div className="flex min-h-screen bg-blue-100">
-
-
-      {/* Main content */}
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="bg-white p-8 rounded-xl shadow-xl text-center w-full max-w-md">
           <h2 className="text-2xl font-bold text-blue-800 mb-3">Make a Payment</h2>
@@ -57,18 +66,6 @@ export default function PaymentPage() {
           >
             Pay ₹{amount}
           </button>
-
-          <p className="mt-6 text-sm text-gray-500">
-            Or use your payment link: <br />
-            <a
-              href="https://rzp.io/rzp/m0HdBj3h"
-              className="text-blue-700 underline"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              razorpay.me/@srisuthipalanisamy
-            </a>
-          </p>
         </div>
       </div>
     </div>
