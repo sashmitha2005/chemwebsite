@@ -14,6 +14,7 @@ import AdminPage from "./pages/AdminPage";
 import OrderBill from "./pages/OrderBill";
 import AdminDashboard from './pages/AdminDashboard';
 import AdminOrdersPage from './pages/AdminOrdersPAge'; 
+import PaymentPage from './pages/PaymentPage';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
         <Route path="/bill" element={<OrderBill />} />
         <Route path="/admindashboard" element={<AdminDashboard/>}/>
          <Route path="/adminorders" element={<AdminOrdersPage />} />
+         <Route path="/payment" element={<PaymentPage />} /> {/* ✅ Added route for payment */}
       
 
          
