@@ -17,10 +17,7 @@ const router = express.Router();
 
 
 
-// Nexmo API credentials (replace with your own)
-const NEXMO_API_KEY = process.env.NEXMO_API_KEY;
-const NEXMO_API_SECRET = process.env.NEXMO_API_SECRET;
-const NEXMO_BRAND_NAME = 'Southern Chemicals'; // Your brand name or sender ID
+
 
 // Function to generate OTP
 function generateOTP() {

@@ -18,6 +18,7 @@ const Cart = () => {
   const [otpSent, setOtpSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
   const [formErrors, setFormErrors] = useState({});
+  const [paymentMode, setPaymentMode] = useState("cod");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -118,7 +119,7 @@ const Cart = () => {
       const generatedOtp = response.data.otp;
 
       if (generatedOtp) {
-        localStorage.setItem("generatedOtp", generatedOtp); // Store OTP for test verification
+        localStorage.setItem("generatedOtp", generatedOtp);
         alert("OTP sent to your email");
         setOtpSent(true);
       } else {
@@ -148,71 +149,88 @@ const Cart = () => {
     }
   };
 
-  const placeOrder = async (productToOrder = null) => {
+  const placeOrder = async () => {
     if (!otpVerified) {
       alert("Please verify OTP before placing the order.");
       return;
     }
 
-    try {
-      const token = localStorage.getItem("token");
+    const orderData = selectedProduct
+      ? [{
+          productId: selectedProduct.productId._id || selectedProduct.productId,
+          quantity: selectedProduct.quantity,
+        }]
+      : cartItems.map((item) => ({
+          productId: item.productId._id || item.productId,
+          quantity: item.quantity,
+        }));
 
-      const orderData = productToOrder
-        ? [{
-            productId: productToOrder.productId._id || productToOrder.productId,
-            quantity: productToOrder.quantity,
-          }]
-        : cartItems.map((item) => ({
-            productId: item.productId._id || item.productId,
-            quantity: item.quantity,
-          }));
+    if (orderData.length === 0) {
+      alert("No valid products to order.");
+      return;
+    }
 
-      if (orderData.length === 0) {
-        alert("No valid products to order.");
-        return;
-      }
+    const amount = orderData.reduce((acc, item) => {
+      const product = cartItems.find(c => (c.productId._id || c.productId) === item.productId);
+      return acc + (item.quantity * (product?.productId?.price || 0));
+    }, 0);
 
-      const response = await axiosClient.post(
-        "/cartorder",
-        {
-          products: orderData,
+    if (paymentMode === "online") {
+      navigate("/payment", {
+        state: {
+          amount,
+          orderData,
           customer: userDetails,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      );
+      });
+    } else {
+      try {
+        const token = localStorage.getItem("token");
 
-      alert("✅ Order placed successfully!");
-      setCartItems([]);
-      fetchCartItems();
-      setShowForm(false);
-      setOtpSent(false);
-      setOtpVerified(false);
-      setOtp("");
-      setUserDetails({ email: "", name: "", address: "", phone: "" });
-      setFormErrors({});
-      navigate("/myorders", { state: { orders: response.data.orders } });
-    } catch (error) {
-      console.error("❌ Failed to place order:", error);
-      alert(error.response?.data?.error || "Something went wrong while placing the order.");
+        const response = await axiosClient.post(
+          "/cartorder",
+          {
+            products: orderData,
+            customer: userDetails,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
+
+        alert("✅ Order placed successfully!");
+        setCartItems([]);
+        fetchCartItems();
+        resetForm();
+        navigate("/myorders", { state: { orders: response.data.orders } });
+      } catch (error) {
+        console.error("❌ Failed to place order:", error);
+        alert(error.response?.data?.error || "Something went wrong while placing the order.");
+      }
     }
   };
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      sendOtp();
-    }
+    if (validateForm()) sendOtp();
   };
 
   const handleOtpSubmit = (e) => {
     e.preventDefault();
     verifyOtp();
+  };
+
+  const resetForm = () => {
+    setShowForm(false);
+    setOtpSent(false);
+    setOtpVerified(false);
+    setOtp("");
+    setUserDetails({ email: "", name: "", address: "", phone: "" });
+    setFormErrors({});
   };
 
   const totalAmount = cartItems.reduce((acc, item) => {
@@ -331,6 +349,29 @@ const Cart = () => {
             />
             {formErrors.phone && <span className="error">{formErrors.phone}</span>}
 
+            <div className="payment-mode">
+              <label>
+                <input
+                  type="radio"
+                  name="payment"
+                  value="cod"
+                  checked={paymentMode === "cod"}
+                  onChange={() => setPaymentMode("cod")}
+                />
+                Cash on Delivery
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="payment"
+                  value="online"
+                  checked={paymentMode === "online"}
+                  onChange={() => setPaymentMode("online")}
+                />
+                Online Payment
+              </label>
+            </div>
+
             {otpSent && (
               <div className="otp-input">
                 <input
@@ -345,25 +386,17 @@ const Cart = () => {
 
             <div className="modal-buttons">
               <button type="button" onClick={() => setShowForm(false)}>Cancel</button>
-              {
-
-
-
-
-
-
-
-otpVerified ? (
-<button type="button" onClick={() => placeOrder(selectedProduct || null)}>Place Order</button>
-) : (
-<button type="submit">Send OTP</button>
-)}
-</div>
-</form>
-</div>
-)}
-</div>
-);
+              {otpVerified ? (
+                <button type="button" onClick={placeOrder}>Place Order</button>
+              ) : (
+                <button type="submit">Send OTP</button>
+              )}
+            </div>
+          </form>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default Cart;
