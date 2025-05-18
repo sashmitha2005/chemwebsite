@@ -46,7 +46,7 @@ const HomePage = () => {
         <div className="navbar-container">
           <div className="navbar-left">
             <h1 className="text-3xl font-extrabold text-blue-700 tracking-wide">
-              Southern Chemicals
+             
             </h1>
           </div>
           <div className="navbar-right">

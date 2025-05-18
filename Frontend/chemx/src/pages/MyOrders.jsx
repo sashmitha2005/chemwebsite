@@ -65,7 +65,7 @@ const MyOrders = () => {
 
               {/* Order Status & Total Amount */}
               <div className="order-status-total">
-                <p><strong>Status:</strong> {order.status || "Placed"}</p>
+               
                 <p><strong>Total Amount:</strong> ₹{order.totalAmount}</p>
               </div>
 

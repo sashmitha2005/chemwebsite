@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { axiosClient } from '../axios/AxiosSetup';
 import './AdminOrdersPage.css';
+
 const AdminOrdersPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [checkedItems, setCheckedItems] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,6 +34,21 @@ const AdminOrdersPage = () => {
     fetchOrders();
   }, []);
 
+  const goToBillPage = (order) => {
+    navigate("/bill", { state: { order } });
+  };
+
+  const toggleItemChecked = (orderId, itemIndex) => {
+    setCheckedItems((prev) => {
+      const prevOrder = prev[orderId] || [];
+      const isChecked = prevOrder.includes(itemIndex);
+      const updatedOrder = isChecked
+        ? prevOrder.filter((i) => i !== itemIndex)
+        : [...prevOrder, itemIndex];
+      return { ...prev, [orderId]: updatedOrder };
+    });
+  };
+
   if (loading) {
     return <div className="text-center p-4">Loading...</div>;
   }
@@ -39,10 +56,6 @@ const AdminOrdersPage = () => {
   if (error) {
     return <div className="text-center text-red-500 p-4">{error}</div>;
   }
-
-  const goToBillPage = (order) => {
-    navigate("/bill", { state: { order } });
-  };
 
   return (
     <div className="container mx-auto p-4">
@@ -60,48 +73,70 @@ const AdminOrdersPage = () => {
           </tr>
         </thead>
         <tbody>
-          {orders.map((order) => (
-            <tr key={order._id}>
-              <td className="px-4 py-2 border-b">{order._id}</td>
-              <td className="px-4 py-2 border-b">
-                {order.userId && order.userId.name ? order.userId.name : 'N/A'}
-              </td>
-              <td className="px-4 py-2 border-b">{new Date(order.orderDate).toLocaleDateString()}</td>
-              <td className="px-4 py-2 border-b">
-                {Array.isArray(order.items) && order.items.length > 0
-                  ? order.items.map((item, index) => (
-                      <div key={item.productId?._id || index}>
-                        {item.productId?.name || 'Unknown Product'} x{item.quantity}
+          {orders.map((order) => {
+            const isOrderBlurred =
+              checkedItems[order._id]?.length === order.items.length;
+
+            return (
+              <tr
+                key={order._id}
+                className={isOrderBlurred ? 'opacity-50 blur-sm' : ''}
+              >
+                <td className="px-4 py-2 border-b">{order._id}</td>
+                <td className="px-4 py-2 border-b">
+                  {order.userId && order.userId.name ? order.userId.name : 'N/A'}
+                </td>
+                <td className="px-4 py-2 border-b">
+                  {new Date(order.orderDate).toLocaleDateString()}
+                </td>
+                <td className="px-4 py-2 border-b">
+                  {Array.isArray(order.items) && order.items.length > 0 ? (
+                    order.items.map((item, index) => (
+                      <div key={item.productId?._id || index} className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={checkedItems[order._id]?.includes(index) || false}
+                          onChange={() => toggleItemChecked(order._id, index)}
+                        />
+                        <span>
+                          {item.productId?.name || 'Unknown Product'} x{item.quantity}
+                        </span>
                       </div>
                     ))
-                  : 'No items'}
-              </td>
-              <td className="px-4 py-2 border-b">
-                {Array.isArray(order.items) && order.items.length > 0
-                  ? order.items.reduce(
-                      (total, item) => total + (item.productId?.price || 0) * item.quantity,
-                      0
-                    ).toFixed(2)
-                  : '0.00'}
-              </td>
-              <td className="px-4 py-2 border-b">
-                <button
-                  className="generate-bill-btn"
-                  onClick={() => goToBillPage(order)}
-                  style={{
-                    padding: '8px 16px',
-                    backgroundColor: '#2563eb',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                  }}
-                >
-                  Generate Bill
-                </button>
-              </td>
-            </tr>
-          ))}
+                  ) : (
+                    'No items'
+                  )}
+                </td>
+                <td className="px-4 py-2 border-b">
+                  {Array.isArray(order.items) && order.items.length > 0
+                    ? order.items
+                        .reduce(
+                          (total, item) =>
+                            total + (item.productId?.price || 0) * item.quantity,
+                          0
+                        )
+                        .toFixed(2)
+                    : '0.00'}
+                </td>
+                <td className="px-4 py-2 border-b">
+                  <button
+                    className="generate-bill-btn"
+                    onClick={() => goToBillPage(order)}
+                    style={{
+                      padding: '8px 16px',
+                      backgroundColor: '#2563eb',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Generate Bill
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

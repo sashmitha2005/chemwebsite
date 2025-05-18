@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import "./PaymentPage.css"; // Assuming you have a CSS file for styles
 
 export default function PaymentPage() {
   const location = useLocation();

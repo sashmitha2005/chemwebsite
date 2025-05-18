@@ -297,28 +297,33 @@ router.delete('/remove/:id', userAuth, async (req, res) => {
 
 // Backend: Express.js route for updating a product
 router.put('/update/:id', async (req, res) => {
-  const { id } = req.params; // Get product ID from URL
-  const { name, quantity, unit, price } = req.body; // Get updated product details from the request body
+  const { id } = req.params;
+  const { name, quantity, unit, price } = req.body;
 
   try {
-    const product = await Product.findById(id); // Look for the product by its ID
+    const product = await Product.findById(id);
+
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    // Update the product
-    product.name = name;
-    product.quantity = quantity;
-    product.unit = unit;
-    product.price = price;
+    // Only update fields if they are provided
+    if (name !== undefined) product.name = name;
+    if (quantity !== undefined) product.quantity = quantity;
+    if (unit !== undefined) product.unit = unit;
+    if (price !== undefined) product.price = price;
 
-    await product.save(); // Save the updated product
+    await product.save();
 
-    res.status(200).json({ product });
+    res.status(200).json({
+      message: 'Product updated successfully',
+      product,
+    });
   } catch (error) {
     res.status(500).json({ message: 'Error updating product: ' + error.message });
   }
 });
+
 
 
 

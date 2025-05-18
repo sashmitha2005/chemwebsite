@@ -1,58 +1,114 @@
-/* Full-screen overlay */
+/* Full-screen overlay with blur effect */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(30, 64, 175, 0.5); /* semi-transparent blue overlay */
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 999;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease-out forwards;
 }
 
-/* Modal box */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Modern payment card design */
 .modal-content {
-  position: relative; /* Make sure the modal container is positioned relative */
-  padding: 2rem 1.5rem 1.5rem 1.5rem; /* Keep some padding for content */
+  position: relative;
+  padding: 2.5rem;
   background: white;
-  border-radius: 8px;
-  max-width: 400px;
-  margin: auto;
-  /* other styles */
+  border-radius: 16px;
+  width: 100%;
+  max-width: 450px;
+  margin: 1rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  transform: translateY(20px);
+  animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  overflow: hidden;
 }
 
+@keyframes slideUp {
+  to { transform: translateY(0); }
+}
+
+.modal-content::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background: linear-gradient(90deg, #2563eb, #1e40af);
+}
+
+/* Close button with hover effect */
 .modal-close-btn {
   position: absolute;
-  top: 10px;  /* Adjust distance from top */
-  right: 10px; /* Adjust distance from right */
-  background: transparent;
+  top: 16px;
+  right: 16px;
+  background: #f1f5f9;
   border: none;
-  font-size: 1.5rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  color: #555;
-  line-height: 1;
+  transition: all 0.3s ease;
+  color: #64748b;
+  font-size: 1.25rem;
 }
 
 .modal-close-btn:hover {
-  color: #1e40af;
+  background: #e2e8f0;
+  color: #1e293b;
+  transform: rotate(90deg);
 }
 
-/* Rest of the form styles remain the same */
-/* Inputs, buttons, headings, etc. reuse previous styles */
+/* Payment card header */
 .payment-card h2 {
-  color: #1e40af;
+  color: #1e293b;
   font-weight: 700;
-  margin-bottom: 1rem;
-  font-size: 2rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.75rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.payment-card h2::before {
+  content: "💳";
+  font-size: 1.5rem;
 }
 
 .payment-card p {
-  color: #3b82f6;
+  color: #64748b;
   margin-bottom: 2rem;
   font-weight: 500;
-  font-size: 1.05rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Form input styling */
+.payment-card .form-group {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.payment-card label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #334155;
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
 .payment-card input[type="text"],
@@ -60,13 +116,14 @@
 .payment-card input[type="tel"],
 .payment-card input[type="number"] {
   width: 100%;
-  padding: 0.75rem 1rem;
-  margin-bottom: 1.25rem;
-  border: 2px solid #93c5fd;
-  border-radius: 0.5rem;
-  font-size: 1rem;
+  padding: 0.85rem 1.25rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.95rem;
   color: #1e293b;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.3s ease;
+  background-color: #f8fafc;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .payment-card input[type="text"]:focus,
@@ -75,37 +132,142 @@
 .payment-card input[type="number"]:focus {
   outline: none;
   border-color: #2563eb;
-  box-shadow: 0 0 5px #2563ebaa;
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
 }
 
 .payment-card input::placeholder {
-  color: #93c5fd;
+  color: #94a3b8;
   font-weight: 400;
 }
 
+/* Card number special styling */
+.card-number-group {
+  position: relative;
+}
+
+.card-number-group::after {
+  content: "";
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 25px;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38 24"><rect width="38" height="24" rx="4" fill="%23f1f5f9"/><path d="M35 4a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v16a4 4 0 0 0 4 4h24a4 4 0 0 0 4-4V4Z" fill="%23fff"/><path d="M7 4h24v16H7V4Z" fill="%231e40af"/><circle cx="28" cy="12" r="4" fill="%23f59e0b"/></svg>');
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.7;
+}
+
+/* Expiry and CVV grid */
+.card-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+/* Submit button */
 .payment-card button {
-  background-color: #1e40af;
+  background: linear-gradient(to right, #2563eb, #1e40af);
   color: white;
-  padding: 0.85rem 1rem;
+  padding: 1rem;
   width: 100%;
   border: none;
-  border-radius: 0.75rem;
-  font-size: 1.15rem;
+  border-radius: 12px;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.25s ease, box-shadow 0.25s ease;
-  box-shadow: 0 4px 8px rgba(30, 64, 175, 0.4);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  margin-top: 0.5rem;
+  position: relative;
+  overflow: hidden;
 }
 
 .payment-card button:hover {
-  background-color: #2563eb;
-  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.4);
 }
 
-/* Responsive */
+.payment-card button:active {
+  transform: translateY(0);
+}
+
+.payment-card button::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to bottom right,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0) 60%
+  );
+  transform: rotate(30deg);
+  transition: all 0.5s ease;
+}
+
+.payment-card button:hover::after {
+  left: 100%;
+}
+
+/* Payment methods tabs */
+.payment-methods {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.payment-method {
+  flex: 1;
+  padding: 0.75rem;
+  text-align: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.payment-method.active {
+  border-color: #2563eb;
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.payment-method:hover {
+  background-color: #f8fafc;
+}
+
+/* Responsive design */
 @media (max-width: 480px) {
   .modal-content {
     padding: 2rem 1.5rem;
     max-width: 95vw;
+    margin: 0.5rem;
   }
+  
+  .card-details-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .payment-methods {
+    flex-direction: column;
+  }
+}
+
+/* Loading animation */
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+.processing {
+  animation: pulse 1.5s infinite ease-in-out;
 }

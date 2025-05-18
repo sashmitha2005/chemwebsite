@@ -1,0 +1,202 @@
+/* Add this to your CSS file or style tag */
+.bill-container {
+  padding: 40px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  max-width: 800px;
+  margin: 40px auto;
+  background: white;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.bill-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
+}
+
+.bill-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.bill-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 5px;
+  position: relative;
+  display: inline-block;
+}
+
+.bill-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
+  border-radius: 2px;
+}
+
+.bill-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin-top: 5px;
+}
+
+.customer-section, .items-section {
+  margin-bottom: 30px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2563eb;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.customer-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.detail-item {
+  margin-bottom: 8px;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: #475569;
+  display: inline-block;
+  min-width: 80px;
+}
+
+.items-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.items-table thead {
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
+  color: white;
+}
+
+.items-table th {
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 500;
+}
+
+.items-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.items-table tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+.items-table tr:hover {
+  background-color: #f1f5f9;
+}
+
+.total-section {
+  margin-top: 30px;
+  text-align: right;
+}
+
+.total-amount {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1e40af;
+  margin-bottom: 5px;
+}
+
+.gst-note {
+  font-size: 14px;
+  color: #64748b;
+  font-style: italic;
+}
+
+.action-buttons {
+  text-align: center;
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.print-button {
+  padding: 12px 30px;
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.print-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.print-button svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+/* Watermark effect */
+.bill-container::after {
+  content: 'INVOICE';
+  position: absolute;
+  bottom: 10%;
+  right: 5%;
+  font-size: 120px;
+  font-weight: 800;
+  color: rgba(37, 99, 235, 0.05);
+  z-index: 0;
+  pointer-events: none;
+  transform: rotate(-15deg);
+}
+
+/* Print-specific styles */
+@media print {
+  .bill-container {
+    box-shadow: none;
+    border: none;
+    padding: 0;
+    max-width: 100%;
+  }
+  
+  .action-buttons {
+    display: none;
+  }
+  
+  .bill-container::before,
+  .bill-container::after {
+    display: none;
+  }
+}
