@@ -33,13 +33,6 @@ const ProductPage = () => {
   }, []);
 
   const handleAddToCart = async (productId, productName) => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      alert("You need to log in to add items to the cart.");
-      return;
-    }
-
     try {
       const response = await axiosClient.post(
         "/addcart",

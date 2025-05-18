@@ -1,10 +1,22 @@
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 export default function PaymentPage() {
-  const [amount, setAmount] = useState(500);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [contact, setContact] = useState("");
+  const location = useLocation();
+
+  // Extract passed data from location.state or fallback to defaults
+  const {
+    amount: passedAmount = 500,
+    customer = {},
+  } = location.state || {};
+
+  const [amount, setAmount] = useState(passedAmount);
+  const [name, setName] = useState(customer.name || "");
+  const [email, setEmail] = useState(customer.email || "");
+  const [contact, setContact] = useState(customer.phone || "");
+
+  // Modal open state
+  const [isModalOpen, setIsModalOpen] = useState(true);
 
   // Load Razorpay script once
   useEffect(() => {
@@ -38,6 +50,7 @@ export default function PaymentPage() {
         setName("");
         setEmail("");
         setContact("");
+        setIsModalOpen(false); // Close modal after success
       },
       prefill: {
         name,
@@ -56,54 +69,106 @@ export default function PaymentPage() {
     rzp.open();
   };
 
+  // Close modal handler
+  const closeModal = () => setIsModalOpen(false);
+
+  // Inline styles for modal content and close button
+  const modalContentStyle = {
+    position: "relative",
+    background: "white",
+    borderRadius: "8px",
+    padding: "2rem 1.5rem 1.5rem 1.5rem",
+    maxWidth: "400px",
+    margin: "auto",
+  };
+
+  const closeBtnStyle = {
+    position: "absolute",
+    top: "10px",
+    right: "10px",
+    background: "transparent",
+    border: "none",
+    fontSize: "1.5rem",
+    cursor: "pointer",
+    color: "#555",
+    lineHeight: 1,
+  };
+
   return (
-    <div className="flex min-h-screen bg-blue-100">
-      <div className="flex-1 flex items-center justify-center p-6">
-        <div className="bg-white p-8 rounded-xl shadow-xl text-center w-full max-w-md">
-          <h2 className="text-2xl font-bold text-blue-800 mb-3">Make a Payment</h2>
-          <p className="mb-4">Fill in your details and payment amount:</p>
+    <>
+      {isModalOpen && (
+        <div className="modal-overlay" style={{ 
+          position: "fixed", 
+          top: 0, left: 0, right: 0, bottom: 0, 
+          backgroundColor: "rgba(0,0,0,0.5)", 
+          display: "flex", 
+          justifyContent: "center", 
+          alignItems: "center",
+          zIndex: 9999,
+        }}>
+          <div className="modal-content payment-card" style={modalContentStyle}>
+            <button
+              className="modal-close-btn"
+              onClick={closeModal}
+              aria-label="Close modal"
+              style={closeBtnStyle}
+            >
+              &times;
+            </button>
 
-          <input
-            type="text"
-            placeholder="Your Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full px-4 py-2 border border-blue-300 rounded-md mb-3"
-          />
+            <h2 className="text-2xl font-bold mb-3">Make a Payment</h2>
 
-          <input
-            type="email"
-            placeholder="Email Address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-2 border border-blue-300 rounded-md mb-3"
-          />
+            <input
+              type="text"
+              placeholder="Your Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              style={{ display: "block", width: "100%", marginBottom: "10px", padding: "8px" }}
+            />
 
-          <input
-            type="tel"
-            placeholder="Phone Number"
-            value={contact}
-            onChange={(e) => setContact(e.target.value)}
-            className="w-full px-4 py-2 border border-blue-300 rounded-md mb-3"
-          />
+            <input
+              type="email"
+              placeholder="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={{ display: "block", width: "100%", marginBottom: "10px", padding: "8px" }}
+            />
 
-          <input
-            type="number"
-            placeholder="Amount"
-            value={amount}
-            onChange={(e) => setAmount(Number(e.target.value))}
-            className="w-full px-4 py-2 border border-blue-300 rounded-md mb-4"
-            min={1}
-          />
+            <input
+              type="tel"
+              placeholder="Phone Number"
+              value={contact}
+              onChange={(e) => setContact(e.target.value)}
+              style={{ display: "block", width: "100%", marginBottom: "10px", padding: "8px" }}
+            />
 
-          <button
-            onClick={handleRazorpayPayment}
-            className="w-full py-3 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition"
-          >
-            Pay ₹{amount}
-          </button>
+            <input
+              type="number"
+              placeholder="Amount"
+              value={amount}
+              onChange={(e) => setAmount(Number(e.target.value))}
+              min={1}
+              style={{ display: "block", width: "100%", marginBottom: "15px", padding: "8px" }}
+            />
+
+            <button
+              onClick={handleRazorpayPayment}
+              style={{
+                width: "100%",
+                padding: "10px",
+                backgroundColor: "#1e3a8a",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "16px",
+              }}
+            >
+              Pay ₹{amount}
+            </button>
+          </div>
         </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 }

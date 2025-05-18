@@ -27,13 +27,6 @@ const Cart = () => {
 
   const fetchCartItems = async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        console.error("User is not authenticated");
-        setLoading(false);
-        return;
-      }
-
       const response = await axiosClient.get("/viewcart");
       if (response.data.cart && response.data.cart.items) {
         const validItems = response.data.cart.items.filter((item) => item.productId);
@@ -175,15 +168,31 @@ const Cart = () => {
       return acc + (item.quantity * (product?.productId?.price || 0));
     }, 0);
 
-    if (paymentMode === "online") {
-      navigate("/payment", {
-        state: {
-          amount,
-          orderData,
-          customer: userDetails,
-        },
-      });
-    } else {
+   if (paymentMode === "online") {
+  const amount = cartItems.reduce((acc, item) => {
+    return acc + item.quantity * (item.productId?.price || 0);
+  }, 0);
+
+  const orderData = selectedProduct
+    ? [{
+        productId: selectedProduct.productId._id || selectedProduct.productId,
+        quantity: selectedProduct.quantity,
+      }]
+    : cartItems.map((item) => ({
+        productId: item.productId._id || item.productId,
+        quantity: item.quantity,
+      }));
+
+  navigate("/payment", {
+    state: {
+      amount,
+      customer: userDetails,
+      orderData,
+    },
+  });
+  return;
+}
+ else {
       try {
         const token = localStorage.getItem("token");
 
@@ -368,12 +377,14 @@ const Cart = () => {
                   checked={paymentMode === "online"}
                   onChange={() => setPaymentMode("online")}
                 />
-                Online Payment
+                Pay Online
               </label>
             </div>
 
-            {otpSent && (
-              <div className="otp-input">
+            {!otpSent ? (
+              <button type="submit">Send OTP</button>
+            ) : !otpVerified ? (
+              <>
                 <input
                   type="text"
                   placeholder="Enter OTP"
@@ -381,17 +392,10 @@ const Cart = () => {
                   onChange={(e) => setOtp(e.target.value)}
                 />
                 <button onClick={handleOtpSubmit}>Verify OTP</button>
-              </div>
+              </>
+            ) : (
+              <button type="button" onClick={placeOrder}>Place Order</button>
             )}
-
-            <div className="modal-buttons">
-              <button type="button" onClick={() => setShowForm(false)}>Cancel</button>
-              {otpVerified ? (
-                <button type="button" onClick={placeOrder}>Place Order</button>
-              ) : (
-                <button type="submit">Send OTP</button>
-              )}
-            </div>
           </form>
         </div>
       )}
