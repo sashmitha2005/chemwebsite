@@ -9,7 +9,7 @@ const authRoutes = require('./routes/Auth');
 
 const app = express();
 
-app.use(cors({credentials:true,origin:"http://localhost:5173"})); // Adjust the origin as needed
+app.use(cors({credentials:true,origin:"https://chemwebsite-s73p.vercel.app"})); // Adjust the origin as needed
 app.use(session({
   name: 'sessionId',             // cookie name
   secret: 'your-secret',
