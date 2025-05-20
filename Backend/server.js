@@ -11,17 +11,18 @@ const app = express();
 
 app.use(cors({credentials:true,origin:"https://chemwebsite-s73p.vercel.app"})); // Adjust the origin as needed
 app.use(session({
-  name: 'sessionId',             // cookie name
+  name: 'sessionId',
   secret: 'your-secret',
   resave: true,
   saveUninitialized: false,
   cookie: {
-    httpOnly: false,              // JavaScript can’t access it (good)
-    secure: false,                // true if using HTTPS
-    sameSite: 'lax',            // required for cross-origin
-    maxAge: 7 * 24 * 60 * 60 * 1000,  // 7 days
-  },
+    httpOnly: true,     // safer
+    secure: true,       // true for HTTPS
+    sameSite: 'none',   // allow cross-site cookies
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  }
 }));
+
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }));
