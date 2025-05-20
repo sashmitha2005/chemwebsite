@@ -13,7 +13,7 @@ import Login from './pages/Login';
 import AdminPage from "./pages/AdminPage";
 import OrderBill from "./pages/OrderBill";
 import AdminDashboard from './pages/AdminDashboard';
-import AdminOrdersPage from './pages/AdminOrdersPAge'; 
+import AdminOrdersPage from './pages/AdminOrdersPage'; 
 import PaymentPage from './pages/PaymentPage';
 
 function App() {
