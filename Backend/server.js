@@ -9,16 +9,22 @@ const authRoutes = require('./routes/Auth');
 
 const app = express();
 
-app.use(cors({credentials:true,origin:"https://chemwebsite-s73p.vercel.app"})); // Adjust the origin as needed
+app.use((req, res, next) => {
+  console.log(req);
+  next();
+})
+
+app.use(cors({ credentials: true, origin: true }));
+
 app.use(session({
   name: 'sessionId',
   secret: 'your-secret',
   resave: true,
   saveUninitialized: false,
   cookie: {
-    httpOnly: true,     // safer
-    secure: true,       // true for HTTPS
-    sameSite: 'none',   // allow cross-site cookies
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   }
 }));
@@ -40,4 +46,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
-    
