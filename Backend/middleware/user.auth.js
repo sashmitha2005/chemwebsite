@@ -2,15 +2,29 @@ const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 
 const authMiddleware = (req, res, next) => {
-  if (req.session.user) {
-    req.userId= req.session.user.id;
-    console.log(req.session)
+  const tokenHeader = req.header('x-auth-token') || req.header('authorization');
+  let token;
+
+  if (tokenHeader && tokenHeader.startsWith('Bearer ')) {
+    token = tokenHeader.split(' ')[1];
+  } else {
+    token = tokenHeader;
+  }
+
+  if (!token) {
+    console.log('No token provided');
+    return res.status(401).json({ message: 'No token, authorization denied' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-jwt-secret');
+    req.userId = decoded.user.id;
+    console.log(decoded.user.id);
+    console.log('User authenticated:', decoded.user);
     next();
-  } else { 
-    console.log(req.session)
-
-    res.status(401).send('Unauthorized');
-
+  } catch (err) { 
+    console.error('Token verification failed:', err.message);
+    res.status(401).json({ message: 'Token is invalid or expired' });
   }
 };
 
