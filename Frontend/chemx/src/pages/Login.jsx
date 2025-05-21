@@ -41,8 +41,8 @@ const Login = ({ setShowModal, setIsLogin, setShowAdminModal }) => {
           email,
           password,
         });
-
         alert("Login successful!");
+        localStorage.setItem("jwtToken", response.data.token);
         setShowModal(false);
         navigate("/products");
       } catch (error) {
