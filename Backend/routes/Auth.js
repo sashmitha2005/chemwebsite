@@ -9,15 +9,11 @@ const Cart = require('../models/cart');
 const Order = require('../models/order');
 const nodemailer = require("nodemailer");
 const authMiddleware = require("../middleware/user.auth");
-const adminAuth = require("../middleware/admin.auth");
+const adminAuth = require('../middleware/user.auth');
 const userAuth = require('../middleware/user.auth');
 const crypto = require('crypto');
 
 const router = express.Router();
-
-
-
-
 
 // Function to generate OTP
 function generateOTP() {
@@ -42,10 +38,49 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Login Route - session-based login
 router.post('/login', async (req, res) => {
   try {
-    console.log(req.body)
+    console.log(req.body);
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) return res.status(404).json({ error: "User not found" });
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) return res.status(400).json({ error: "Invalid credentials" });
+    
+    const payload = {
+      user: {
+        id: user._id,
+        email: user.email
+      }
+    };
+    jwt.sign(
+      payload,
+      process.env.JWT_SECRET || 'your-jwt-secret',
+      { expiresIn: '7d' },
+      (err, token) => {
+        if (err) throw err;
+        res.json({
+          success: true,
+          token,
+          user: {
+            _id: user._id,
+            name: user.name,
+            email: user.email
+          }
+        });
+      }
+    );
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+router.post('/adminLogin', async (req, res) => {
+  try {
+    console.log(req.body);
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
@@ -53,47 +88,39 @@ router.post('/login', async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ error: "Invalid credentials" });
-
-
-    // Store user data in session
-    req.session.user = {
-      id: user._id,
-      name: user.name,
-      email: user.email,
+    
+    const payload = {
+      user: {
+        id: user._id,
+        email: user.email
+      }
     };
-
-    res.json({ message: "Login successful" });
+    
+    jwt.sign(
+      payload,
+      process.env.JWT_SECRET || 'your-jwt-secret',
+      { expiresIn: '7d' },
+      (err, token) => {
+        if (err) throw err;
+        res.json({
+          success: true,
+          token,
+          user: {
+            _id: user._id,
+            name: user.name,
+            email: user.email
+          }
+        });
+      }
+    );
   } catch (err) {
-    console.log(err)
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-// Admin login
-router.post('/adminlogin', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await Admin.findOne({ email });
-    if (!user) return res.status(404).json({ error: "Admin not found" });
-
-    if (password !== user.password) {
-      return res.status(400).json({ error: "Invalid credentials" });
-    }
-    req.session.user = {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-    };
-
-    res.status(200).json({ message: "Admin login successful" });
-    res.json({ token, user: { id: user._id, name: user.name, email: user.email } });
-  } catch (err) {
+    console.log(err);
     res.status(500).json({ error: "Server error" });
   }
 });
 
 // Add product (Admin only)
-router.post('/add', authMiddleware, async (req, res) => {
+router.post('/add', userAuth, async (req, res) => {
   try {
     const { name, quantity, unit, price, image } = req.body;
 
@@ -355,7 +382,7 @@ router.post('/logout', (req, res) => {
     res.json({ message: "Logged out successfully" });
   });
 });
-router.get('/view', adminAuth, async (req, res) => {
+router.get('/view', userAuth, async (req, res) => {
   try {
     const products = await Product.find().populate('adminId', 'name email');
     res.status(200).json({ products });
@@ -364,7 +391,7 @@ router.get('/view', adminAuth, async (req, res) => {
   }
 });
 // Get all orders (Admin only)
-router.get('/adminorders', authMiddleware, async (req, res) => {
+router.get('/adminorders', userAuth, async (req, res) => {
   try {
     // Fetch all orders from the database, populate relevant fields
     const orders = await Order.find()
