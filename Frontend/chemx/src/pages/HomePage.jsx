@@ -19,22 +19,18 @@ const HomePage = () => {
 
   const handleAdminLogin = async () => {
     try {
+      setError("");
       const response = await axiosClient.post("/adminlogin", {
-       
-        email, password 
+        email, password
       });
-
-     
-
       if (response.status === 200) {
-        
         alert("Admin logged in successfully");
         setShowAdminModal(false);
+        localStorage.setItem("jwtToken", response.data.token);
         navigate("/adminpage");
-      } else {
-        setError(data.error);
-      }
-    } catch (err) {
+      } }
+      catch (err) {
+      console.error("Admin login error:", err);
       setError("Something went wrong");
     }
   };
@@ -46,7 +42,7 @@ const HomePage = () => {
         <div className="navbar-container">
           <div className="navbar-left">
             <h1 className="text-3xl font-extrabold text-blue-700 tracking-wide">
-             
+
             </h1>
           </div>
           <div className="navbar-right">
@@ -106,7 +102,7 @@ const HomePage = () => {
               &times;
             </span>
             <h2 className="modal-title">Admin Login</h2>
-            {error && <p className="error-text">{error}</p>}
+            {error.trim() !== "" && <p className="error-text">{error}</p>}
             <input
               type="email"
               placeholder="Admin Email"
